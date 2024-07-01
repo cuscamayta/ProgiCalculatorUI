@@ -5,7 +5,8 @@ export default {
 
     app.config.globalProperties.$get = async (endpoint) => {
       try {
-        const response = await fetch(`${apiUrl}/${endpoint}`);
+        console.log("asdasdsad");
+        const response = await fetch(`${apiUrl}/progi${endpoint}`);
         const data = await response.json();
         return data;
       } catch (error) {
@@ -16,7 +17,8 @@ export default {
 
     app.config.globalProperties.$post = async (endpoint, payload) => {
       try {
-        const response = await fetch(`${apiUrl}/${endpoint}`, {
+        console.log(endpoint, payload);
+        const response = await fetch(`${apiUrl}/progi${endpoint}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

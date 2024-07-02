@@ -5,7 +5,6 @@ export default {
 
     app.config.globalProperties.$get = async (endpoint) => {
       try {
-        console.log("asdasdsad");
         const response = await fetch(`${apiUrl}/progi${endpoint}`);
         const data = await response.json();
         return data;

@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <v-main>
+      <v-toolbar title="PROGI" color="primary" />
       <router-view />
     </v-main>
   </v-app>

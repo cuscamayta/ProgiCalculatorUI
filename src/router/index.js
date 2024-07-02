@@ -1,13 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
-import PriceCalculator from "../views/PriceCalculator.vue";
-import NotFoundPage from "../views/404.vue";
+import PriceCalculator from "../modules/priceCalculator/routes";
+import NotFoundPage from "../core/views/404.vue";
 
 const routes = [
-  {
-    path: "/",
-    name: "PriceCalculator",
-    component: PriceCalculator,
-  },
+  ...PriceCalculator,
   {
     path: "/:catchAll(.*)",
     component: NotFoundPage,

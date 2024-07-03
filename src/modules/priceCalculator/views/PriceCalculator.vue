@@ -14,7 +14,7 @@
       <v-col cols="12">
         <v-select
           label="Enter the price of the vehicle"
-          :items="['Common', 'Luxury']"
+          :items="carTypes.map((item) => item.label)"
           v-model="selectedVehicleType"
           @update:modelValue="onSelectChange"
         ></v-select>
@@ -51,6 +51,7 @@
   </v-container>
 </template>
 <script>
+import { ref } from "vue";
 import CardPrice from "../components/CardPrice.vue";
 import TablePrice from "../components/TablePrice.vue";
 export default {
@@ -66,6 +67,21 @@ export default {
       loading: false,
 
       totalAmount: null,
+    };
+  },
+  setup() {
+    const carTypes = ref([]);
+    const getCarTypes = async () => {
+      const response = await fetch(
+        `${process.env.VUE_APP_API_URL}/car-types`
+      ).then((res) => res.json());
+      carTypes.value = response;
+    };
+    getCarTypes();
+
+    return {
+      carTypes,
+      getCarTypes,
     };
   },
   methods: {
@@ -85,7 +101,9 @@ export default {
     },
     async getPrice() {
       const response = await this.$post("/calculator", {
-        type: this.selectedVehicleType,
+        carTypeId: this.carTypes.find(
+          (e) => e.label === this.selectedVehicleType
+        ).id,
         basePrice: this.price,
       });
       this.loading = false;

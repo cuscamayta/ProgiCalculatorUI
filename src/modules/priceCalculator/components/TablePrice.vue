@@ -6,10 +6,6 @@
         :key="index"
         class="d-flex align-center"
       >
-        <v-divider
-          v-if="index === totalAmount.length - 1"
-          style="margin: 12px 0px"
-        ></v-divider>
         <v-col cols="8">
           <h3 class="text-truncate">{{ fee.typeFee }}</h3>
         </v-col>
@@ -17,7 +13,20 @@
           cols="4"
           class="d-flex flex-column justify-center align-center text-center"
         >
-          <LoadingChip :title="fee.cost" :loading="loading" />
+          <LoadingChip :title="fee.cost.toFixed(2)" :loading="loading" />
+        </v-col>
+      </v-row>
+      <v-divider style="margin: 12px 0px"></v-divider>
+
+      <v-row class="d-flex align-center">
+        <v-col cols="8">
+          <h3 class="text-truncate">Total Cost</h3>
+        </v-col>
+        <v-col
+          cols="4"
+          class="d-flex flex-column justify-center align-center text-center"
+        >
+          <LoadingChip :title="totalAmount.totalCost" :loading="loading" />
         </v-col>
       </v-row>
     </v-container>
@@ -40,6 +49,11 @@ export default {
     loading: {
       type: Boolean,
       required: true,
+    },
+  },
+  methods: {
+    showFields(fields) {
+      console.log(fields);
     },
   },
 };

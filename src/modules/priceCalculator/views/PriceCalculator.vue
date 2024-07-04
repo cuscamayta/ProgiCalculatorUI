@@ -62,7 +62,6 @@ export default {
   data() {
     return {
       price: 0,
-      selectedVehicleType: null,
       timeout: null,
       loading: false,
 
@@ -71,16 +70,19 @@ export default {
   },
   setup() {
     const carTypes = ref([]);
+    const selectedVehicleType = ref(null);
     const getCarTypes = async () => {
       const response = await fetch(
         `${process.env.VUE_APP_API_URL}/car-types`
       ).then((res) => res.json());
       carTypes.value = response;
+      selectedVehicleType.value = response[0].label;
     };
     getCarTypes();
 
     return {
       carTypes,
+      selectedVehicleType,
       getCarTypes,
     };
   },
@@ -93,7 +95,7 @@ export default {
       };
       this.timeout = setTimeout(() => {
         this.getPrice();
-      }, 1000);
+      }, 0);
     },
     onSelectChange() {
       this.loading = true;
@@ -104,13 +106,17 @@ export default {
         carTypeId: this.carTypes.find(
           (e) => e.label === this.selectedVehicleType
         ).id,
-        basePrice: this.price,
+        basePrice: Number(this.price),
       });
       this.loading = false;
-      this.totalAmount = {
-        ...this.totalAmount,
-        ...response,
-      };
+      let feeArrays = [],
+        total = ["Total", 0];
+      for (let key in response) {
+        if (key != "TotalCost")
+          feeArrays.push([key, Number(response[key]).toFixed(2)]);
+        else total[1] = Number(response[key]).toFixed(2);
+      }
+      this.totalAmount = [...feeArrays, ["Car Price", this.price], total];
     },
   },
 };

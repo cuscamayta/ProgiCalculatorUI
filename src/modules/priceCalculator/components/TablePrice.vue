@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-container>
+    <v-container v-if="!loading">
       <v-row
         v-for="(pairValue, index) in totalAmount"
         :key="index"
@@ -21,6 +21,9 @@
         </v-col>
       </v-row>
     </v-container>
+    <v-row v-else class="loading-span">
+      <LoadingChip title="" :loading="loading" />
+    </v-row>
   </v-card>
 </template>
 <script>
@@ -41,3 +44,10 @@ export default {
   },
 };
 </script>
+<style scoped>
+.loading-span {
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+}
+</style>

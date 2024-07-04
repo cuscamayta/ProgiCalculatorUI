@@ -21,23 +21,8 @@
       </v-col>
     </v-row>
     <v-row v-if="price == 0 || selectedVehicleType == null">
-      <v-col cols="4">
-        <CardPrice
-          title="Basic user fee"
-          description="Basic user fee: 10% of the price of the vehicle"
-        />
-      </v-col>
-      <v-col cols="4" class="d-flex align-center">
-        <CardPrice
-          title="The seller's special fee"
-          description="The seller's special fee"
-        />
-      </v-col>
-      <v-col cols="4" class="d-flex align-center">
-        <CardPrice
-          title="Costs for the association"
-          description="The added costs for the association based on the price of the vehicle"
-        />
+      <v-col v-for="(feeType, index) in feesTypes" :key="index">
+        <CardPrice :title="feeType.name" :description="feeType.description" />
       </v-col>
     </v-row>
     <v-row
@@ -54,6 +39,7 @@
 import { ref } from "vue";
 import CardPrice from "../components/CardPrice.vue";
 import TablePrice from "../components/TablePrice.vue";
+import { useStore } from "vuex";
 export default {
   components: {
     CardPrice,
@@ -69,7 +55,9 @@ export default {
     };
   },
   setup() {
+    const store = useStore();
     const carTypes = ref([]);
+    const feesTypes = ref([]);
     const selectedVehicleType = ref(null);
     const getCarTypes = async () => {
       const response = await fetch(
@@ -80,9 +68,33 @@ export default {
     };
     getCarTypes();
 
+    const getFeeTypes = (res) => {
+      return res.reduce((feesTypes, item) => {
+        const currentFeeType = item.feesTypes;
+        let exist = feesTypes.findIndex(
+          (feeType) => feeType.id == currentFeeType.id
+        );
+        if (exist < 0) {
+          feesTypes.push(currentFeeType);
+          exist = feesTypes.length - 1;
+        }
+
+        return feesTypes;
+      }, []);
+    };
+
+    const getFees = async () => {
+      const response = await fetch(`${process.env.VUE_APP_API_URL}/fees`).then(
+        (res) => res.json()
+      );
+      feesTypes.value = getFeeTypes(response);
+    };
+    getFees();
     return {
       carTypes,
+      feesTypes,
       selectedVehicleType,
+      store,
       getCarTypes,
     };
   },
@@ -95,7 +107,7 @@ export default {
       };
       this.timeout = setTimeout(() => {
         this.getPrice();
-      }, 0);
+      }, 1000);
     },
     onSelectChange() {
       this.loading = true;
@@ -115,6 +127,14 @@ export default {
         if (key != "TotalCost")
           feeArrays.push([key, Number(response[key]).toFixed(2)]);
         else total[1] = Number(response[key]).toFixed(2);
+      }
+      if (response) {
+        delete response.TotalCost;
+        this.store.dispatch("priceCalculatorHistory/saveQuote", {
+          "Car Price": this.price,
+          ...response,
+          "Total Costs": total[1],
+        });
       }
       this.totalAmount = [...feeArrays, ["Car Price", this.price], total];
     },

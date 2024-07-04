@@ -23,20 +23,21 @@ export default {
     const quoteHistory = ref([]);
     const headers = ref([]);
     quoteHistory.value = store.getters["priceCalculatorHistory/quoteHistory"];
-    console.log("asdasdasd");
     const getHeaders = () => {
       if (quoteHistory.value.length > 0) {
-        const headers = Object.keys(quoteHistory.value[0]).map((key) => ({
-          text: key.toUpperCase(),
-          value: key,
+        let headers = quoteHistory.value[0].fees.map((fee) => ({
+          title: fee.typeFee.toUpperCase(),
+          key: fee.typeFee,
         }));
-        return headers.value;
+        return [
+          { title: "CAR PRICE", key: "carPrice" },
+          ...headers,
+          { title: "TOTAL COST", key: "totalCost" },
+        ];
       }
       return [];
     };
     headers.value = getHeaders();
-    console.log(quoteHistory);
-    console.log(headers);
     return {
       store,
       quoteHistory,
@@ -45,19 +46,17 @@ export default {
   },
   computed: {
     formattedQuoteHistory() {
-      return this.quoteHistory.map((item) => ({ ...item }));
+      return this.quoteHistory.map((item) => {
+        let result = {
+          carPrice: item.carPrice,
+          totalCost: item.totalCost,
+        };
+        item.fees.map((fee) => {
+          result[fee.typeFee] = fee.cost;
+        });
+        return result;
+      });
     },
   },
 };
 </script>
-
-<style scoped>
-.no-quotes-message {
-  background-color: yellow;
-  padding: 10px;
-  text-align: center;
-  margin-top: 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-</style>

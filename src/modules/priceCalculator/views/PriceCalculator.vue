@@ -22,7 +22,12 @@
     </v-row>
     <v-row v-if="price == 0 || selectedVehicleType == null">
       <v-col v-for="(feeType, index) in feesTypes" :key="index">
-        <CardPrice :title="feeType.name" :description="feeType.description" />
+        <CardPrice
+          :title="feeType.name"
+          :description="feeType.description"
+          lg="3"
+          xl="6"
+        />
       </v-col>
     </v-row>
     <v-row
@@ -51,7 +56,10 @@ export default {
       timeout: null,
       loading: false,
 
-      totalAmount: null,
+      totalAmount: {
+        carPrice: 0,
+        fees: [],
+      },
     };
   },
   setup() {
@@ -104,6 +112,7 @@ export default {
       this.loading = true;
       this.totalAmount = {
         carPrice: this.price,
+        fees: [],
       };
       this.timeout = setTimeout(() => {
         this.getPrice();
@@ -121,27 +130,14 @@ export default {
         basePrice: Number(this.price),
       });
       this.loading = false;
-      let [feeArrays, total] = this.mapQuotes(response);
-      this.saveQuote(response, total);
-      this.totalAmount = [...feeArrays, ["Car Price", this.price], total];
+      this.totalAmount = response;
+      this.saveQuote(response);
     },
-    mapQuotes(response) {
-      let feeArrays = [],
-        total = ["Total", 0];
-      for (let key in response) {
-        if (key != "TotalCost")
-          feeArrays.push([key, Number(response[key]).toFixed(2)]);
-        else total[1] = Number(response[key]).toFixed(2);
-      }
-      return [feeArrays, total];
-    },
-    saveQuote(response, total) {
+    saveQuote(response) {
       if (response) {
-        delete response.TotalCost;
         this.store.dispatch("priceCalculatorHistory/saveQuote", {
-          "Car Price": this.price,
+          carPrice: this.price,
           ...response,
-          "Total Costs": total[1],
         });
       }
     },

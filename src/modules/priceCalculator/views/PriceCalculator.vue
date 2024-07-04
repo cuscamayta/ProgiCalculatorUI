@@ -121,6 +121,11 @@ export default {
         basePrice: Number(this.price),
       });
       this.loading = false;
+      let [feeArrays, total] = this.mapQuotes(response);
+      this.saveQuote(response, total);
+      this.totalAmount = [...feeArrays, ["Car Price", this.price], total];
+    },
+    mapQuotes(response) {
       let feeArrays = [],
         total = ["Total", 0];
       for (let key in response) {
@@ -128,6 +133,9 @@ export default {
           feeArrays.push([key, Number(response[key]).toFixed(2)]);
         else total[1] = Number(response[key]).toFixed(2);
       }
+      return [feeArrays, total];
+    },
+    saveQuote(response, total) {
       if (response) {
         delete response.TotalCost;
         this.store.dispatch("priceCalculatorHistory/saveQuote", {
@@ -136,7 +144,6 @@ export default {
           "Total Costs": total[1],
         });
       }
-      this.totalAmount = [...feeArrays, ["Car Price", this.price], total];
     },
   },
 };

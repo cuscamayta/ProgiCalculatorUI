@@ -1,7 +1,10 @@
 <template>
   <v-app>
     <v-main>
-      <v-toolbar title="PROGI" color="primary" />
+      <v-toolbar title="PROGI" color="primary">
+        <v-btn :to="{ name: 'PriceCalculator' }"> Price Calculator </v-btn>
+        <v-btn :to="{ name: 'QuoteHistory' }"> History </v-btn>
+      </v-toolbar>
       <router-view />
       <SnackbarAlert />
     </v-main>

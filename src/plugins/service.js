@@ -9,15 +9,20 @@ export default {
       try {
         const response = await fetch(`${apiUrl}${endpoint}`);
         const data = await response.json();
+        if (!response.ok) {
+          const errorType = Object.keys(data.errors)[0];
+          const errorMessage =
+            `${errorType} ${data.errors[errorType]}` || "Unknown error";
+          throw new Error(errorMessage);
+        }
         return data;
       } catch (error) {
         if (store) {
           store.dispatch("snackbar/showSnackbar", {
-            message: "Error fetching data: " + error.message,
+            message: error.message,
             color: "error",
           });
         }
-        console.error("Error fetching data:", error);
         throw error;
       }
     };
@@ -33,15 +38,16 @@ export default {
         });
         const data = await response.json();
         if (!response.ok) {
-          const errorMessage = data.title || "Unknown error";
+          const errorType = Object.keys(data.errors)[0];
+          const errorMessage =
+            `${errorType} ${data.errors[errorType]}` || "Unknown error";
           throw new Error(errorMessage);
         }
         return data;
       } catch (error) {
-        console.log("JAKSBHDJKABSKDJL");
         if (store) {
           store.dispatch("snackbar/showSnackbar", {
-            message: "Error posting data: " + error.message,
+            message: error.message,
             color: "error",
           });
         }
